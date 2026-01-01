@@ -1,0 +1,39 @@
+/* ===== Reset & Base Styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1a1a2e;
+  background-color: #f8fafc;
+}
+
+a {
+  text-decoration: none;
+  color: #4F46E5;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #3730a3;
+}
+
+/* ===== Main Container ===== */
+.container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+}
