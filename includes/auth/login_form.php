@@ -3,22 +3,24 @@
   <div class="auth-card">
     <h2 class="auth-title">Welcome back</h2>
     <p class="auth-subtitle">Login to continue your stock analysis journey</p>
+    <?php if (!empty($error) || !empty($success)) : ?>
+      <div class="auth-alert <?php echo !empty($error) ? 'auth-alert-error' : 'auth-alert-success'; ?>">
+        <?php echo nl2br(htmlspecialchars(!empty($error) ? $error : $success)); ?>
+      </div>
+    <?php endif; ?>
     
     <form class="auth-form" action="" method="POST">
       <div class="form-group">
         <label for="username">Username*</label>
-        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        <input type="text" id="username" name="username" placeholder="Enter your username" value="<?php echo htmlspecialchars($form_values['username'] ?? ''); ?>" required>
       </div>
       
       <div class="form-group">
         <label for="password">Password*</label>
         <div class="password-input">
-          <input type="password" id="password" name="password" placeholder="Enter password" required>
-          <button type="button" class="toggle-password" onclick="togglePassword('password')">
-            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
+          <input type="password" id="password" name="password" placeholder="Enter password" value="<?php echo htmlspecialchars($form_values['password'] ?? ''); ?>" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('password', this)" data-eye="assets/images/eye.svg" data-eye-slash="assets/images/eye-slash.svg">
+            <img class="eye-icon" src="assets/images/eye.svg" alt="Toggle password visibility">
           </button>
         </div>
       </div>

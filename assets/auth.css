@@ -28,6 +28,27 @@
   margin-bottom: 40px;
 }
 
+.auth-alert {
+  margin-bottom: 24px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.auth-alert-error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.auth-alert-success {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
 /* Form Styles */
 .auth-form {
   width: 100%;
@@ -147,6 +168,12 @@
 
 .toggle-password:hover {
   color: #64748b;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 /* Terms Text */
