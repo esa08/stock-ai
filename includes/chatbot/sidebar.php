@@ -62,8 +62,18 @@
       <span class="user-icon" aria-hidden="true">
         <i class="fa-solid fa-user"></i>
       </span>
-      <span class="user-name">Andrew Neilson</span>
+      <span class="user-name"><?php echo $_SESSION['username']; ?></span>
     </div>
-    <button class="logout-btn" type="button">Logout</button>
+    <button class="logout-btn" type="button" id="logoutBtn">Logout</button>
   </div>
 </aside>
+
+<?php
+// echo json_encode($_SESSION);
+?>
+<script>
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    fetch('../../function/logout.php', { method: 'POST' })
+    .then(() => window.location.href = 'index.php');
+  });
+</script>
