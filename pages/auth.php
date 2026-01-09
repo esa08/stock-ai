@@ -188,7 +188,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
 
       $_SESSION['is_login'] = true;
-      $_SESSION['username'] = $username;
+      $_SESSION['user'] = [
+        'id' => $user['id'],
+        'username' => $username,
+      ];
       header('Location: index.php');
       exit;
   }

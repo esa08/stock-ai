@@ -11,50 +11,7 @@
       <div class="section-title">Your conversations</div>
       <button class="clear-all-btn" type="button">Clear All</button>
     </div>
-    <ul class="conversation-list">
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">Create Html Game Environment...</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">Apply To Leave For Emergency</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">What Is UI UX Design?</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">Create POS System</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">What Is UX Audit?</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">Create Chatbot GPT...</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-      <li class="conversation-row">
-        <button type="button" class="conversation-item">How Chat GPT Work?</button>
-        <button type="button" class="conversation-remove" aria-label="Remove conversation">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </li>
-    </ul>
+    <ul class="conversation-list" id="conversationList"></ul>
   </div>
 
   <div class="sidebar-footer">
@@ -62,7 +19,7 @@
       <span class="user-icon" aria-hidden="true">
         <i class="fa-solid fa-user"></i>
       </span>
-      <span class="user-name"><?php echo $_SESSION['username']; ?></span>
+      <span class="user-name"><?php echo $_SESSION['user']['username']; ?></span>
     </div>
     <button class="logout-btn" type="button" id="logoutBtn">Logout</button>
   </div>
@@ -72,8 +29,36 @@
 // echo json_encode($_SESSION);
 ?>
 <script>
+  // fucntion logout
   document.getElementById('logoutBtn').addEventListener('click', function () {
     fetch('../../function/logout.php', { method: 'POST' })
     .then(() => window.location.href = 'index.php');
   });
+
+  function getConversations() {
+    fetch(`../../api/getConversations.php`, { method: 'GET' })
+    .then(response => response.json())
+    .then(data => {
+      const conversationList = document.getElementById('conversationList');
+      let item = '';
+      if (data.success && Array.isArray(data.data)) {
+        data.data.forEach(conv => {
+          item += `
+            <li class="conversation-row" data-id="${conv.id}">
+              <button type="button" class="conversation-item">${conv.title ? conv.title : 'Untitled Conversation'}</button>
+              <button type="button" class="conversation-remove" aria-label="Remove conversation">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </li>
+          `;
+        });
+      }
+      conversationList.innerHTML = item;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  getConversations();
 </script>
