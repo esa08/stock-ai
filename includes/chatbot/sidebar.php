@@ -61,4 +61,33 @@
   }
 
   getConversations();
+
+  // Event delegation for remove conversation buttons
+  document.getElementById('conversationList').addEventListener('click', function(e) {
+    const removeBtn = e.target.closest('.conversation-remove');
+    if (!removeBtn) return;
+
+    const conversationRow = removeBtn.closest('.conversation-row');
+    const conversationId = conversationRow.dataset.id;
+
+    fetch('../../api/deleteConversation.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ conversation_id: conversationId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        getConversations(); // Refresh the conversation list
+      } else {
+        alert(data.message || 'Failed to delete conversation.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to delete conversation.');
+    });
+  });
 </script>
