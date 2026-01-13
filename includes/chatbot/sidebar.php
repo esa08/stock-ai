@@ -41,7 +41,7 @@
     .then(data => {
       const conversationList = document.getElementById('conversationList');
       let item = '';
-      if (data.success && Array.isArray(data.data)) {
+      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         data.data.forEach(conv => {
           item += `
             <li class="conversation-row" data-id="${conv.id}">
@@ -52,6 +52,13 @@
             </li>
           `;
         });
+      } else {
+        item = `
+          <li class="conversation-empty">
+            <img src="../../assets/images/empty-chat.svg" alt="No conversations" />
+            <span style="text-align: center; width: 100%;">No conversations yet</span>
+          </li>
+        `;
       }
       conversationList.innerHTML = item;
     })
@@ -88,6 +95,32 @@
     .catch(error => {
       console.error('Error:', error);
       alert('Failed to delete conversation.');
+    });
+  });
+
+  // Clear all conversations
+  document.querySelector('.clear-all-btn').addEventListener('click', function() {
+    if (!confirm('Are you sure you want to delete all conversations? This action cannot be undone.')) {
+      return;
+    }
+
+    fetch('../../api/clearAllConversations.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        getConversations(); // Refresh the conversation list
+      } else {
+        alert(data.message || 'Failed to clear all conversations.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to clear all conversations.');
     });
   });
 </script>

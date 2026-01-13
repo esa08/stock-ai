@@ -126,6 +126,25 @@
   background-color: #fee2e2;
 }
 
+.conversation-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.conversation-empty img {
+  width: 80px;
+  height: auto;
+  opacity: 0.8;
+}
+
+.conversation-empty span {
+  font-size: 13px;
+  color: #9ca3af;
+}
 
 .sidebar-footer {
   margin-top: auto;
