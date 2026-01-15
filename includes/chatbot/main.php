@@ -19,59 +19,8 @@
       <span class="main-label">CHAT A.I+</span>
     </div>
 
-    <div class="chat-messages">
-      <div class="chat-message from-bot">
-        <p>Hello! I'm here to help with your questions.</p>
-        <span class="chat-time">09:18</span>
-      </div>
-      <div class="chat-message from-user">
-        <p>Can you help me plan a weekly budget?</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-bot">
-        <p>Sure! Please share your income and main expenses.</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-user">
-        <p>Can you help me plan a weekly budget?</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-bot">
-        <p>Sure! Please share your income and main expenses.</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-user">
-        <p>Can you help me plan a weekly budget?</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-bot">
-        <p>Sure! Please share your income and main expenses.</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-user">
-        <p>Can you help me plan a weekly budget?</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-bot">
-        <p>Sure! Please share your income and main expenses.</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-user">
-        <p>Can you help me plan a weekly budget?</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-bot">
-        <p>Sure! Please share your income and main expenses.</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-user">
-        <p>Can you help me plan a weekly budget?</p>
-        <span class="chat-time">09:19</span>
-      </div>
-      <div class="chat-message from-bot">
-        <p>Sure! Please share your income and main expenses.</p>
-        <span class="chat-time">09:19</span>
-      </div>
+    <div class="chat-messages" id="chatMessages">
+      <!-- Messages will be rendered dynamically -->
     </div>
 
     <div class="chat-input chat-input--bottom">

@@ -121,6 +121,12 @@
   background-color: #f3f4f6;
 }
 
+.conversation-item.active {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  font-weight: 500;
+}
+
 .conversation-remove:hover {
   color: #ef4444;
   background-color: #fee2e2;
@@ -287,6 +293,17 @@
 
 .from-user .chat-time {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.chat-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9ca3af;
+  font-size: 14px;
+  text-align: center;
+  padding: 40px;
 }
 
 .chat-input {
