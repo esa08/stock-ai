@@ -142,6 +142,19 @@
     return div.innerHTML;
   }
 
+  // Parse markdown for bot messages
+  function parseMarkdown(text) {
+    if (typeof marked !== 'undefined') {
+      // Configure marked for safe rendering
+      marked.setOptions({
+        breaks: true,
+        gfm: true
+      });
+      return marked.parse(text);
+    }
+    return escapeHtml(text);
+  }
+
   // Show intro view
   function showIntroView() {
     const introView = document.querySelector('[data-view="intro"]');
@@ -191,9 +204,10 @@
     let html = '';
     messages.forEach(msg => {
       const roleClass = msg.role === 'user' ? 'from-user' : 'from-bot';
+      const content = msg.role === 'user' ? `<p>${escapeHtml(msg.content)}</p>` : `<div class="message-content">${parseMarkdown(msg.content)}</div>`;
       html += `
         <div class="chat-message ${roleClass}">
-          <p>${escapeHtml(msg.content)}</p>
+          ${content}
           <span class="chat-time">${formatTime(msg.created_at)}</span>
         </div>
       `;
@@ -235,5 +249,233 @@
 
     const conversationId = conversationRow.dataset.id;
     loadConversation(conversationId);
+  });
+
+  // ========== CHAT AI IMPLEMENTATION ==========
+  
+  let isGenerating = false;
+
+  // Get all send buttons and inputs
+  function getSendElements() {
+    return {
+      introInput: document.querySelector('[data-view="intro"] .chat-input input'),
+      introBtn: document.querySelector('[data-view="intro"] .send-btn'),
+      chatInput: document.querySelector('[data-view="chat"] .chat-input input'),
+      chatBtn: document.querySelector('[data-view="chat"] .send-btn')
+    };
+  }
+
+  // Set loading state on all send buttons
+  function setLoadingState(loading) {
+    isGenerating = loading;
+    const { introBtn, chatBtn, introInput, chatInput } = getSendElements();
+    
+    [introBtn, chatBtn].forEach(btn => {
+      if (!btn) return;
+      if (loading) {
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('is-loading');
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+      }
+    });
+
+    [introInput, chatInput].forEach(input => {
+      if (input) input.disabled = loading;
+    });
+  }
+
+  // Add user message to chat UI
+  function addUserMessage(content) {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+
+    // Remove empty state if present
+    const emptyState = chatMessages.querySelector('.chat-empty');
+    if (emptyState) emptyState.remove();
+
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    
+    const messageHtml = `
+      <div class="chat-message from-user">
+        <p>${escapeHtml(content)}</p>
+        <span class="chat-time">${time}</span>
+      </div>
+    `;
+    chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Add or update bot message in chat UI
+  function addBotMessage(content, isStreaming = false) {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return null;
+
+    let botMessage = chatMessages.querySelector('.chat-message.from-bot.is-streaming');
+    
+    if (!botMessage) {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+      
+      const messageHtml = `
+        <div class="chat-message from-bot ${isStreaming ? 'is-streaming' : ''}">
+          <div class="message-content"></div>
+          <span class="chat-time">${time}</span>
+        </div>
+      `;
+      chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+      botMessage = chatMessages.querySelector('.chat-message.from-bot.is-streaming') || 
+                   chatMessages.querySelector('.chat-message.from-bot:last-child');
+    }
+
+    const contentEl = botMessage.querySelector('.message-content');
+    if (contentEl) {
+      contentEl.innerHTML = parseMarkdown(content);
+    }
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return botMessage;
+  }
+
+  // Finalize bot message (remove streaming class)
+  function finalizeBotMessage() {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+
+    const streamingMessage = chatMessages.querySelector('.chat-message.from-bot.is-streaming');
+    if (streamingMessage) {
+      streamingMessage.classList.remove('is-streaming');
+    }
+  }
+
+  // Send message to AI
+  async function sendMessage(message) {
+    if (!message.trim() || isGenerating) return;
+
+    setLoadingState(true);
+
+    // Switch to chat view if on intro
+    const introView = document.querySelector('[data-view="intro"]');
+    if (introView && !introView.classList.contains('is-hidden')) {
+      showChatView();
+      // Clear chat messages for new conversation
+      const chatMessages = document.getElementById('chatMessages');
+      if (chatMessages) chatMessages.innerHTML = '';
+    }
+
+    // Add user message to UI
+    addUserMessage(message);
+
+    // Clear input
+    const { introInput, chatInput } = getSendElements();
+    if (introInput) introInput.value = '';
+    if (chatInput) chatInput.value = '';
+
+    let fullResponse = '';
+    
+    try {
+      const response = await fetch('../../api/sendMessage.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: message,
+          conversation_id: activeConversationId
+        })
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            const eventType = line.substring(7).trim();
+            continue;
+          }
+          
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.substring(6));
+              
+              if (data.conversation_id && !activeConversationId) {
+                activeConversationId = data.conversation_id;
+                // Refresh conversation list to show new conversation
+                getConversations();
+                setTimeout(() => updateActiveConversationUI(), 500);
+              }
+
+              if (data.text) {
+                fullResponse += data.text;
+                addBotMessage(fullResponse, true);
+              }
+
+              if (data.message) {
+                // Error message
+                console.error('API Error:', data.message);
+                addBotMessage('Sorry, an error occurred: ' + data.message, false);
+              }
+            } catch (e) {
+              // Ignore JSON parse errors for incomplete chunks
+            }
+          }
+        }
+      }
+
+      finalizeBotMessage();
+      
+      // Refresh conversation list to update order
+      getConversations();
+      setTimeout(() => updateActiveConversationUI(), 500);
+
+    } catch (error) {
+      console.error('Error:', error);
+      addBotMessage('Sorry, failed to connect to the AI service. Please try again.', false);
+      finalizeBotMessage();
+    } finally {
+      setLoadingState(false);
+    }
+  }
+
+  // Handle send button clicks
+  document.addEventListener('click', function(e) {
+    const sendBtn = e.target.closest('.send-btn');
+    if (!sendBtn || isGenerating) return;
+
+    const chatInput = sendBtn.closest('.chat-input');
+    if (!chatInput) return;
+
+    const input = chatInput.querySelector('input');
+    if (!input) return;
+
+    const message = input.value.trim();
+    if (message) {
+      sendMessage(message);
+    }
+  });
+
+  // Handle Enter key on inputs
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' || isGenerating) return;
+
+    const input = e.target;
+    if (!input.matches('.chat-input input')) return;
+
+    e.preventDefault();
+    const message = input.value.trim();
+    if (message) {
+      sendMessage(message);
+    }
   });
 </script>

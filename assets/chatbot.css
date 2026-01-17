@@ -355,6 +355,155 @@
   display: none !important;
 }
 
+/* ===== Send Button Loading State ===== */
+.send-btn.is-loading {
+  cursor: not-allowed;
+  opacity: 0.7;
+  background-color: #8b8bf9;
+}
+
+.send-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.send-btn .fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.chat-input input:disabled {
+  background-color: #f9fafb;
+  cursor: not-allowed;
+}
+
+/* ===== Streaming Message State ===== */
+.chat-message.is-streaming {
+  position: relative;
+}
+
+.chat-message.is-streaming::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  background-color: #5b5bf7;
+  margin-left: 2px;
+  animation: blink 0.8s infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* ===== Markdown Styling in Chat ===== */
+.chat-message .message-content {
+  word-wrap: break-word;
+}
+
+.chat-message .message-content p {
+  margin: 0 0 8px;
+}
+
+.chat-message .message-content p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-message .message-content ul,
+.chat-message .message-content ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.chat-message .message-content li {
+  margin-bottom: 4px;
+}
+
+.chat-message .message-content strong {
+  font-weight: 600;
+}
+
+.chat-message .message-content em {
+  font-style: italic;
+}
+
+.chat-message .message-content code {
+  background-color: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+}
+
+.chat-message .message-content pre {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 12px 14px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.chat-message .message-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 13px;
+}
+
+.chat-message .message-content h1,
+.chat-message .message-content h2,
+.chat-message .message-content h3 {
+  margin: 12px 0 8px;
+  font-weight: 600;
+}
+
+.chat-message .message-content h1 {
+  font-size: 18px;
+}
+
+.chat-message .message-content h2 {
+  font-size: 16px;
+}
+
+.chat-message .message-content h3 {
+  font-size: 15px;
+}
+
+.chat-message .message-content blockquote {
+  border-left: 3px solid #5b5bf7;
+  margin: 8px 0;
+  padding-left: 12px;
+  color: #6b7280;
+}
+
+.chat-message .message-content a {
+  color: #5b5bf7;
+  text-decoration: underline;
+}
+
+.from-user .message-content code {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.from-user .message-content a {
+  color: #ffffff;
+}
+
 @media (max-width: 768px) {
   .chatbot-sidebar {
     width: 100%;
